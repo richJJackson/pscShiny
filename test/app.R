@@ -1,6 +1,4 @@
 library(shiny)
-library(survival)
-library(flexsurv)
 library(ggplot2)
 library(knitr)
 #install.packages("kableExtra")
@@ -8,16 +6,16 @@ library(kableExtra)
 #install.packages("magrittr")
 library(magrittr)  # <-- Add this line to fix the error!
 library(bslib)
-library(thematic)
+#library(thematic)
 
 #setwd("M:/University/R shiny_richard/Richrd_we page")
-#setwd("~/Documents/GitHub/pscShiny/Data")
+setwd("~/Documents/GitHub/pscShiny/Data")
 
-# Load cfm.ob object
-load("data/cfm.ob.R")
+## Load cfm.ob object
+#load("cfm.ob.R")
 
 # Apply thematic styling
-thematic_shiny()
+#thematic_shiny()
 
 # Define UI
 ui <- page_sidebar(
@@ -121,111 +119,6 @@ ui <- page_sidebar(
 # Define Server logic
 server <- function(input, output) {
   
-  survival_probs <- reactive({
-    coeffs <- cfm.ob$model$cov_co
-    gamma0 <- cfm.ob$model$haz_co[1]
-    
-    linear_predictor <- gamma0 +
-      coeffs["extentLA"] * (input$extent == "LA") +
-      coeffs["extentMet"] * (input$extent == "Met") +
-      coeffs["primaryGall"] * (input$primary == "Gall") +
-      coeffs["primaryHilar"] * (input$primary == "Hilar") +
-      coeffs["primaryIntra"] * (input$primary == "Intra") +
-      coeffs["primaryNOS"] * (input$primary == "NOS") +
-      coeffs["alb"] * input$alb +
-      coeffs["bil"] * input$bil
-    
-    surv_times <- seq(0, 60, by = 1)
-    survival_probs <- exp(-exp(linear_predictor) * surv_times)
-    
-    data.frame(Time = surv_times, Survival = c(1, survival_probs[-1]))
-  })
-  
-  output$survival_plot <- renderPlot({
-    surv_data <- survival_probs()
-    ggplot(surv_data, aes(x = Time, y = Survival)) +
-      geom_line(color = "blue") +
-      labs(
-        title = "Predicted Survival Curve",
-        x = "Time (months)",
-        y = "Survival Probability"
-      ) +
-      scale_x_continuous(expand = c(0, 0)) +
-      scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
-      theme_minimal()
-  })
-  
-  output$survival_table <- renderTable({
-    survival_probs()
-  }, rownames = TRUE)
-  
-  output$discrimination_info <- renderUI({
-    if (inherits(cfm.ob$valid$discrim$cm, "coxph")) {
-      # Convert coxph model to a table
-      cm_table <- broom::tidy(cfm.ob$valid$discrim$cm)
-    } else {
-      cm_table <- as.data.frame(cfm.ob$valid$discrim$cm)
-    }
-    
-    tableHTML <- knitr::kable(cm_table, format = "html", caption = "Discrimination Metrics")
-    HTML(tableHTML)
-  })
-  
-  output$calibration_info <- renderTable({
-    data.frame(
-      Metric = c("C-index", "SE(C)", "Slope"),
-      Value = c(
-        cfm.ob$valid$calib$c[1],  # C-index
-        cfm.ob$valid$calib$c[2],  # SE(C)
-        cfm.ob$valid$calib$slope$coef  # Slope
-      )
-    ) %>%
-      knitr::kable(format = "html", caption = "Calibration Metrics") %>%
-      kableExtra::kable_styling("striped", full_width = FALSE)
-  }, sanitize.text.function = function(x) x)
-  
-  output$citation_info <- renderText({
-    cfm.ob$citation
-  })
-  
-  output$model_formula <- renderText({
-    paste(deparse(cfm.ob$model$formula), collapse = " ")
-  })
-  
-  output$model_coefficients <- renderTable({
-    data.frame(Covariate = names(cfm.ob$model$cov_co),
-               Coefficient = cfm.ob$model$cov_co)
-  })
-  
-  output$hazard_coefficients <- renderPrint({
-    cfm.ob$model$haz_co
-  })
-  
-  output$settings_pico <- renderUI({
-    tags$div(
-      tags$h4("Model Settings (PICO)"),
-      tags$ul(
-        tags$li(tags$b("Population:"), cfm.ob$setting$pico$P),
-        tags$li(tags$b("Intervention:"), cfm.ob$setting$pico$I),
-        tags$li(tags$b("Comparison:"), cfm.ob$setting$pico$C),
-        tags$li(tags$b("Outcome:"), cfm.ob$setting$pico$O)
-      )
-    )
-  })
-  
-  output$settings_data <- renderUI({
-    data_info <- cfm.ob$setting$data
-    tags$div(
-      tags$h4("Data Characteristics"),
-      tags$ul(
-        tags$li(tags$b("Extent Classes:"), paste(names(data_info$extent), data_info$extent, collapse = ", ")),
-        tags$li(tags$b("Primary Disease Classes:"), paste(names(data_info$primary), data_info$primary, collapse = ", ")),
-        tags$li(tags$b("Albumin Range:"), paste("Min:", data_info$alb["min"], "Max:", data_info$alb["max"], "IQR:", data_info$alb["miqr"])),
-        
-        tags$li(tags$b("Bilirubin Range:"), paste("Min:", data_info$bil["min"], "Max:", data_info$bil["max"], "IQR:", data_info$bil["miqr"]))
-      )
-    )
-  })
 }
 
 # Run the application
