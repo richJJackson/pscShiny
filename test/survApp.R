@@ -1,6 +1,4 @@
 library(shiny)
-library(survival)
-library(flexsurv)
 library(ggplot2)
 library(knitr)
 #install.packages("kableExtra")
@@ -11,7 +9,7 @@ library(bslib)
 library(thematic)
 
 #setwd("M:/University/R shiny_richard/Richrd_we page")
-#setwd("~/Documents/GitHub/pscShiny/Data")
+setwd("~/Documents/GitHub/pscShiny/Data")
 
 # Load cfm.ob object
 load("cfm.ob.R")

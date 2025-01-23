@@ -10,4 +10,4 @@ setwd("~/Documents/GitHub/pscShiny")
 
 shinylive::export(appdir="test",destdir="docs")
 
-httpuv::runStaticServer("docs")
+#httpuv::runStaticServer("docs")

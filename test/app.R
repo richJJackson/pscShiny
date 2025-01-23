@@ -14,7 +14,7 @@ library(thematic)
 #setwd("~/Documents/GitHub/pscShiny/Data")
 
 # Load cfm.ob object
-load("cfm.ob.R")
+load("data/cfm.ob.R")
 
 # Apply thematic styling
 thematic_shiny()
