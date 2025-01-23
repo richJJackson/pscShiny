@@ -3,19 +3,22 @@ library(survival)
 library(flexsurv)
 library(ggplot2)
 library(knitr)
-install.packages("kableExtra")
+#install.packages("kableExtra")
 library(kableExtra)
-install.packages("magrittr")
+#install.packages("magrittr")
 library(magrittr)  # <-- Add this line to fix the error!
 library(bslib)
 library(thematic)
-setwd("M:/University/R shiny_richard/Richrd_we page")
+
+#setwd("M:/University/R shiny_richard/Richrd_we page")
+#setwd("~/Documents/GitHub/pscShiny/Data")
 
 # Load cfm.ob object
 load("cfm.ob.R")
 
 # Apply thematic styling
 thematic_shiny()
+
 # Define UI
 ui <- page_sidebar(
   theme = bs_theme(
@@ -112,6 +115,8 @@ ui <- page_sidebar(
     )
   )
 )
+
+
 
 # Define Server logic
 server <- function(input, output) {
